@@ -1,70 +1,127 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+
 import Header from "./components/Header";
 import Tasks from "./components/Tasks";
 import AddTask from "./components/AddTask";
+import Footer from "./components/Footer";
+import About from "./components/About";
 
 function App() {
-    const [showAddTask, setShowAddTask] = useState(false)
-    const [tasks, setTasks] = useState([
-        {
-            id: 1,
-            text: "Doctors Appointment",
-            day: "Feb 5th at 2:30pm",
-            reminder: true,
-        },
-        {
-            id: 2,
-            text: "Meeting at School",
-            day: "Feb 6th",
-            reminder: true,
-        },
-        {
-            id: 3,
-            text: "Getting Groceries",
-            day: "Feb 10th",
-            reminder: true,
-        },
-    ]);
+    const [showAddTask, setShowAddTask] = useState(false);
+    const [tasks, setTasks] = useState([]);
+
+    //We can't do useEffect(async() => {})
+    useEffect(() => {
+        const getTasks = async () => {
+            const tasksFromServer = await fetchTasks();
+            setTasks(tasksFromServer);
+        };
+        getTasks();
+    }, []);
+    /*[] is dependency array. If we have a value which we want 
+    it to run for when that value changes,
+    we will pass it in place of dependency array like [user]*/
+
+    //Fetch Tasks
+    const fetchTasks = async () => {
+        const res = await fetch("http://localhost:8000/tasks");
+        const data = await res.json();
+
+        return data;
+    };
+
+    //FetchTask
+    const fetchTask = async (id) => {
+        const res = await fetch(`http://localhost:8000/tasks/${id}`);
+        const data = await res.json();
+
+        return data;
+    };
 
     //Add Task
-    const addTask = (task) => {
-      const id = tasks.length + 1;
-      
-      const newTask = { id, ...task }
-      //Because components in react are not mutable. So we must copy 
-      setTasks([...tasks, newTask]) //copy the previous task and add new onto it
-      
-    }
+    const addTask = async (task) => {
+        const res = await fetch("http://localhost:8000/tasks", {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+            },
+            body: JSON.stringify(task),
+        });
+
+        const data = await res.json();
+
+        setTasks([...tasks, data]);
+
+        //const newTask = { id, ...task };
+        //Because components in react are not mutable. So we must copy
+        //setTasks([...tasks, newTask]); //copy the previous task and add new onto it
+    };
 
     //Delete Task
-    const deleteTask = (id) => {
+    const deleteTask = async (id) => {
+        await fetch(`http://localhost:8000/tasks/${id}`, {
+            method: "DELETE",
+        });
+
         setTasks(tasks.filter((task) => task.id !== id));
     };
 
     //Toggle Reminder
-    const toggleReminder = (id) => {
+    const toggleReminder = async (id) => {
+        const taskToToggle = await fetchTask(id);
+        const updatedTask = {
+            ...taskToToggle,
+            reminder: !taskToToggle.reminder,
+        };
+
+        const res = await fetch(`http://localhost:8000/tasks/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-type": "application/json",
+            },
+            body: JSON.stringify(updatedTask),
+        });
+        const data = await res.json();
+
         setTasks(
             tasks.map((task) =>
-                task.id === id ? { ...task, reminder: !task.reminder } : task
+                task.id === id ? { ...task, reminder: !data.reminder } : task
             )
         );
     };
 
     return (
-        <div className="container">
-            <Header onAdd={( ) => setShowAddTask(!showAddTask)} showAdd={showAddTask} />
-            {/*Short way of doing ternary without an else */}
-            {showAddTask && <AddTask onAdd = {addTask}/>}
-            {tasks.length > 0 ? (
-                <Tasks
-                    tasks={tasks}
-                    onDelete={deleteTask}
-                    onToggle={toggleReminder}
+        <Router>
+            <div className="container">
+                <Header
+                    onAdd={() => setShowAddTask(!showAddTask)}
+                    showAdd={showAddTask}
                 />
-            ) : (
-                "No Task to Show"
-            )}
-        </div>
+
+                <Route
+                    path="/"
+                    exact
+                    render={(props) => (
+                        <>
+                            {/*Short way of doing ternary without an else */}
+                            {showAddTask && <AddTask onAdd={addTask} />}
+                            {tasks.length > 0 ? (
+                                <Tasks
+                                    tasks={tasks}
+                                    onDelete={deleteTask}
+                                    onToggle={toggleReminder}
+                                />
+                            ) : (
+                                "No Task to Show"
+                            )}{" "}
+                        </>
+                    )}
+                />
+                <Route path="/about" component={About} />
+                <Footer />
+            </div>
+        </Router>
     );
 }
 
