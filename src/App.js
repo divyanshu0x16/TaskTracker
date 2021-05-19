@@ -25,7 +25,7 @@ function App() {
 
     //Fetch Tasks
     const fetchTasks = async () => {
-        const res = await fetch("http://localhost:8000/tasks");
+        const res = await fetch("https://reactjs-task-tracker-server.herokuapp.com/tasks");
         const data = await res.json();
 
         return data;
@@ -33,7 +33,7 @@ function App() {
 
     //FetchTask
     const fetchTask = async (id) => {
-        const res = await fetch(`http://localhost:8000/tasks/${id}`);
+        const res = await fetch(`https://reactjs-task-tracker-server.herokuapp.com/tasks/${id}`);
         const data = await res.json();
 
         return data;
@@ -41,7 +41,7 @@ function App() {
 
     //Add Task
     const addTask = async (task) => {
-        const res = await fetch("http://localhost:8000/tasks", {
+        const res = await fetch("https://reactjs-task-tracker-server.herokuapp.com/tasks", {
             method: "POST",
             headers: {
                 "Content-type": "application/json",
@@ -60,7 +60,7 @@ function App() {
 
     //Delete Task
     const deleteTask = async (id) => {
-        await fetch(`http://localhost:8000/tasks/${id}`, {
+        await fetch(`https://reactjs-task-tracker-server.herokuapp.com/tasks/${id}`, {
             method: "DELETE",
         });
 
@@ -75,7 +75,7 @@ function App() {
             reminder: !taskToToggle.reminder,
         };
 
-        const res = await fetch(`http://localhost:8000/tasks/${id}`, {
+        const res = await fetch(`https://reactjs-task-tracker-server.herokuapp.com/tasks/${id}`, {
             method: "PUT",
             headers: {
                 "Content-type": "application/json",
