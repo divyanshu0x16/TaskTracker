@@ -1,7 +1,9 @@
 
 # Task Tracker done using ReactJS
 
-A basic tast traker built using ReactJS, with functionality to add and delete tasks. The data is stored and can be viewed using this [link](https://reactjs-task-tracker-server.herokuapp.com/tasks). Below is an image of the interface when there are some active tasks to display, and the user has picked the option to add a new task. The about section of the page uses routing, so everything is part of a SPA.
+A basic tast traker built using ReactJS, with functionality to add and delete tasks. The data is hosted here [link](https://reactjs-task-tracker-server.herokuapp.com/tasks).Below is an image of the interface when there are some active tasks to display, and the user has picked the option to add a new task. The about section of the page uses routing, so everything is part of a SPA.
+
+**NOTE** - Data takes some time to load up because of Heroku hosting policy.
 
 [Link](https://reactjs-task-tracker.herokuapp.com/) to the final app.
 
